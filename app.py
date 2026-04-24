@@ -11,9 +11,9 @@ st.set_page_config(page_title="QuantWays AI", layout="wide")
 
 # Initialize Gemini
 if "GEMINI_API_KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 else:
-    st.error("Missing API Key! Please add GOOGLE_API_KEY to your Streamlit Secrets.")
+    st.error("Missing API Key! Please add GEMINI_API_KEY to your Streamlit Secrets.")
     st.stop() # This prevents the crash and shows a helpful message instead
 model = genai.GenerativeModel('gemini-1.5-flash')
 
