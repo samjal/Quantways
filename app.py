@@ -75,8 +75,20 @@ if prompt := st.chat_input("Enter an asset ticker (e.g., NVDA)..."):
                     f"Price is {trend} the {ma_window}-day Moving Average. "
                     f"Provide a brief, professional summary of the risk and trend."
                 )
-                
-                response = model.generate_content(ai_prompt)
+
+                # Replace your current model setup with this:
+try:
+    # List available models to the console/app for debugging
+    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+    st.write("Models your key can see:", available_models)
+    
+    # Pick the first available one or default to flash
+    selected_model = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in available_models else available_models[0]
+    model = genai.GenerativeModel(model_name=selected_model)
+except Exception as e:
+    st.error(f"Failed to list models: {e}")
+
+                #response = model.generate_content(ai_prompt)
                 response_text = response.text
                 
                 st.markdown(response_text)
