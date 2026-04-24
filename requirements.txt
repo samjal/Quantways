@@ -3,3 +3,7 @@ yfinance
 pandas
 plotly
 prophet
+langchain
+langchain-openai
+chromadb
+quantstats
