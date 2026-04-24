@@ -9,7 +9,11 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="QuantWays AI", layout="wide")
 
 # Initialize Gemini
-genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+if "GOOGLE_API_KEY" in st.secrets:
+    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+else:
+    st.error("Missing API Key! Please add GOOGLE_API_KEY to your Streamlit Secrets.")
+    st.stop() # This prevents the crash and shows a helpful message instead
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 st.title("QuantWays: Intelligent Market Analytics")
