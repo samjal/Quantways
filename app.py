@@ -5,20 +5,28 @@ import plotly.graph_objects as go
 import google.generativeai as genai
 from datetime import datetime, timedelta
 
-
 # --- 1. Page Configuration & AI Setup ---
 st.set_page_config(page_title="QuantWays AI", layout="wide")
+
+st.title("QuantWays: Intelligent Market Analytics")
+st.markdown("*> Ask the AI to analyze any asset (e.g., 'AAPL', 'BTC-USD', 'EURUSD=X')*")
 
 # Initialize Gemini
 if "GEMINI_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 else:
     st.error("Missing API Key! Please add GEMINI_API_KEY to your Streamlit Secrets.")
-    st.stop() # This prevents the crash and shows a helpful message instead
-model = genai.GenerativeModel('gemini-1.5-flash') 
+    st.stop()
 
-st.title("QuantWays: Intelligent Market Analytics")
-st.markdown("*> Ask the AI to analyze any asset (e.g., 'AAPL', 'BTC-USD', 'EURUSD=X')*")
+# Diagnostic & Model Setup
+try:
+    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+    st.sidebar.write("✅ Models found:", available_models)
+    # Using the production path for the model
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except Exception as e:
+    st.sidebar.error(f"AI Setup failed: {e}")
+    model = None
 
 # --- 2. Sidebar Controls ---
 with st.sidebar:
@@ -61,39 +69,25 @@ if prompt := st.chat_input("Enter an asset ticker (e.g., NVDA)..."):
         with st.spinner(f"QuantWays Agent is analyzing {prompt}..."):
             data, vol = get_market_data(prompt, lookback)
             
-            if data is not None:
-                # Prepare data for Gemini
-                current_price = data['Close'].iloc[-1]
-                ma_val = data[f'MA_{ma_window}'].iloc[-1]
+            if data is not None and model is not None:
+                # Prepare stats
+                current_price = float(data['Close'].iloc[-1])
+                ma_val = float(data[f'MA_{ma_window}'].iloc[-1])
                 trend = "ABOVE" if current_price > ma_val else "BELOW"
                 
                 # Gemini Analysis
                 ai_prompt = (
                     f"You are a professional Quant Analyst for QuantWays. "
-                    f"The user wants an analysis for {prompt.upper()}. "
-                    f"Current Stats: Price ${current_price:.2f}, Volatility {vol:.2%}, "
-                    f"Price is {trend} the {ma_window}-day Moving Average. "
-                    f"Provide a brief, professional summary of the risk and trend."
+                    f"Analyze {prompt.upper()}. Price: ${current_price:.2f}, "
+                    f"Volatility: {vol:.2%}, Trend: {trend} {ma_window}-day MA. "
+                    f"Provide a brief, professional risk summary."
                 )
 
-                # Replace your current model setup with this:
-# --- 1. Page Configuration & AI Setup ---
-st.set_page_config(page_title="QuantWays AI", layout="wide")
-
-# Initialize Gemini
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
-# Diagnostic Block: Align everything inside the 'try'
-try:
-    models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-    st.sidebar.write("✅ Models found:", models)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-except Exception as e:
-    st.sidebar.error(f"Diagnostic failed: {e}")
-    model = None # Prevents later crashes
-
-                #response = model.generate_content(ai_prompt)
-                response_text = response.text
+                try:
+                    response = model.generate_content(ai_prompt)
+                    response_text = response.text
+                except Exception as e:
+                    response_text = f"⚠️ AI Analysis failed: {e}"
                 
                 st.markdown(response_text)
                 
@@ -109,5 +103,5 @@ except Exception as e:
                 
                 st.session_state.messages.append({"role": "assistant", "content": response_text})
             else:
-                error_msg = f"⚠️ No data found for ticker: **{prompt}**."
+                error_msg = f"⚠️ No data found or AI offline for: **{prompt}**."
                 st.error(error_msg)
