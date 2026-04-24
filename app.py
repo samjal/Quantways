@@ -15,7 +15,7 @@ if "GEMINI_API_KEY" in st.secrets:
 else:
     st.error("Missing API Key! Please add GEMINI_API_KEY to your Streamlit Secrets.")
     st.stop() # This prevents the crash and shows a helpful message instead
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash') 
 
 st.title("QuantWays: Intelligent Market Analytics")
 st.markdown("*> Ask the AI to analyze any asset (e.g., 'AAPL', 'BTC-USD', 'EURUSD=X')*")
