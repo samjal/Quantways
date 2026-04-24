@@ -10,7 +10,7 @@ st.write("Current Secrets in Vault:", list(st.secrets.to_dict().keys()))
 st.set_page_config(page_title="QuantWays AI", layout="wide")
 
 # Initialize Gemini
-if "GOOGLE_API_KEY" in st.secrets:
+if "GEMINI_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 else:
     st.error("Missing API Key! Please add GOOGLE_API_KEY to your Streamlit Secrets.")
