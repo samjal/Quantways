@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import google.generativeai as genai
 from datetime import datetime, timedelta
+st.write("Current Secrets in Vault:", list(st.secrets.to_dict().keys()))
 
 # --- 1. Page Configuration & AI Setup ---
 st.set_page_config(page_title="QuantWays AI", layout="wide")
