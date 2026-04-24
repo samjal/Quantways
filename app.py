@@ -21,8 +21,8 @@ else:
 # Model Selection (Using your confirmed available model)
 try:
     # We use gemini-2.0-flash for high-speed quant reasoning
-    # old: model = genai.GenerativeModel('models/gemini-2.0-flash')
-    model = genai.GenerativeModel('models/gemini-1.5-flash')
+    model = genai.GenerativeModel('models/gemini-2.0-flash')
+    # old:model = genai.GenerativeModel('models/gemini-1.5-flash')
 except Exception as e:
     st.error(f"AI Model Initialization failed: {e}")
     model = None
