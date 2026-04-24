@@ -77,16 +77,20 @@ if prompt := st.chat_input("Enter an asset ticker (e.g., NVDA)..."):
                 )
 
                 # Replace your current model setup with this:
+# --- 1. Page Configuration & AI Setup ---
+st.set_page_config(page_title="QuantWays AI", layout="wide")
+
+# Initialize Gemini
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+
+# Diagnostic Block: Align everything inside the 'try'
 try:
-    # List available models to the console/app for debugging
-    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-    st.write("Models your key can see:", available_models)
-    
-    # Pick the first available one or default to flash
-    selected_model = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in available_models else available_models[0]
-    model = genai.GenerativeModel(model_name=selected_model)
+    models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+    st.sidebar.write("✅ Models found:", models)
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
-    st.error(f"Failed to list models: {e}")
+    st.sidebar.error(f"Diagnostic failed: {e}")
+    model = None # Prevents later crashes
 
                 #response = model.generate_content(ai_prompt)
                 response_text = response.text
