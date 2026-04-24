@@ -22,7 +22,10 @@ def get_market_data(ticker, period):
     """Fetches live data and calculates quant metrics."""
     start_date = datetime.now() - timedelta(days=period)
     df = yf.download(ticker, start=start_date, progress=False)
-    
+    # Fix: Flatten MultiIndex columns if they exist (e.g. Price -> Close -> AAPL becomes just Close)
+    if isinstance(df.columns, pd.MultiIndex):
+    df.columns = df.columns.get_level_values(0)
+
     if df.empty:
         return None
         
